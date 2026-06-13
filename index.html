@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>PC Builder Simulator</title>
+<style>
+body{
+    font-family:Arial;
+    background:#111;
+    color:white;
+    text-align:center;
+}
+.container{
+    max-width:800px;
+    margin:auto;
+}
+select{
+    width:300px;
+    padding:8px;
+    margin:5px;
+}
+button{
+    padding:10px 20px;
+    font-size:18px;
+    cursor:pointer;
+}
+#result{
+    margin-top:20px;
+    font-size:20px;
+}
+.good{
+    color:lime;
+}
+.bad{
+    color:red;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>🖥️ PC Building Simulator</h1>
+
+<h2>CPU</h2>
+<select id="cpu">
+<option value="">Vyber CPU</option>
+<option value="LGA1155">Intel i7-3770K</option>
+<option value="LGA1700">Intel i5-14600K</option>
+<option value="AM4">Ryzen 7 5800X</option>
+<option value="AM5">Ryzen 7 9800X3D</option>
+</select>
+
+<h2>Motherboard</h2>
+<select id="mb">
+<option value="">Vyber desku</option>
+<option value="LGA1155">H61</option>
+<option value="LGA1700">Z790</option>
+<option value="AM4">B550</option>
+<option value="AM5">X870</option>
+</select>
+
+<h2>RAM</h2>
+<select id="ram">
+<option>16GB DDR4</option>
+<option>32GB DDR4</option>
+<option>64GB DDR5</option>
+<option>96GB DDR5</option>
+</select>
+
+<h2>GPU</h2>
+<select id="gpu">
+<option>GTX 1060</option>
+<option>RTX 3060</option>
+<option>RTX 5080</option>
+<option>RTX 5090</option>
+</select>
+
+<h2>PSU</h2>
+<select id="psu">
+<option value="500">500W</option>
+<option value="750">750W</option>
+<option value="1000">1000W</option>
+<option value="1200">1200W</option>
+</select>
+
+<br><br>
+
+<button onclick="buildPC()">Postavit PC</button>
+
+<div id="result"></div>
+</div>
+
+<script>
+function buildPC(){
+
+let cpu = document.getElementById("cpu").value;
+let mb = document.getElementById("mb").value;
+let gpu = document.getElementById("gpu").value;
+let psu = parseInt(document.getElementById("psu").value);
+
+let neededPower = 400;
+
+if(gpu==="RTX 3060") neededPower=550;
+if(gpu==="RTX 5080") neededPower=850;
+if(gpu==="RTX 5090") neededPower=1000;
+
+if(cpu==="" || mb===""){
+    result.innerHTML="<span class='bad'>Vyber CPU i základní desku!</span>";
+    return;
+}
+
+if(cpu!==mb){
+    result.innerHTML="<span class='bad'>❌ CPU není kompatibilní se základní deskou!</span>";
+    return;
+}
+
+if(psu<neededPower){
+    result.innerHTML="<span class='bad'>❌ Zdroj je příliš slabý pro tuto grafiku!</span>";
+    return;
+}
+
+let score=Math.floor(Math.random()*100)+1;
+
+result.innerHTML=
+"<span class='good'>✅ Počítač úspěšně sestaven!</span><br><br>"+
+"Výkon: "+score+"/100<br>"+
+"GPU: "+gpu+"<br>"+
+"Zdroj: "+psu+"W";
+}
+</script>
+
+</body>
+</html>
