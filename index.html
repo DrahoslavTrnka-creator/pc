@@ -3,43 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <title>PC Builder Simulator</title>
+
 <style>
 body{
-    font-family:Arial;
     background:#111;
     color:white;
+    font-family:Arial;
     text-align:center;
 }
-.container{
-    max-width:800px;
+
+.box{
+    background:#222;
+    width:700px;
     margin:auto;
+    padding:20px;
+    border-radius:15px;
 }
-select{
-    width:300px;
-    padding:8px;
+
+select,button{
+    width:250px;
+    padding:10px;
     margin:5px;
 }
-button{
-    padding:10px 20px;
-    font-size:18px;
-    cursor:pointer;
-}
+
 #result{
     margin-top:20px;
     font-size:20px;
 }
-.good{
-    color:lime;
-}
-.bad{
-    color:red;
-}
 </style>
+
 </head>
 <body>
 
-<div class="container">
-<h1>🖥️ PC Building Simulator</h1>
+<h1>🖥️ PC Builder Simulator</h1>
+
+<div class="box">
 
 <h2>CPU</h2>
 <select id="cpu">
@@ -59,6 +57,14 @@ button{
 <option value="AM5">X870</option>
 </select>
 
+<h2>GPU</h2>
+<select id="gpu">
+<option>GTX 1060</option>
+<option>RTX 3060</option>
+<option>RTX 5080</option>
+<option>RTX 5090</option>
+</select>
+
 <h2>RAM</h2>
 <select id="ram">
 <option>16GB DDR4</option>
@@ -67,12 +73,12 @@ button{
 <option>96GB DDR5</option>
 </select>
 
-<h2>GPU</h2>
-<select id="gpu">
-<option>GTX 1060</option>
-<option>RTX 3060</option>
-<option>RTX 5080</option>
-<option>RTX 5090</option>
+<h2>SSD</h2>
+<select id="ssd">
+<option>512GB NVMe</option>
+<option>1TB NVMe</option>
+<option>2TB NVMe</option>
+<option>4TB NVMe</option>
 </select>
 
 <h2>PSU</h2>
@@ -88,9 +94,13 @@ button{
 <button onclick="buildPC()">Postavit PC</button>
 
 <div id="result"></div>
+
 </div>
 
 <script>
+
+let money = 100000;
+
 function buildPC(){
 
 let cpu = document.getElementById("cpu").value;
@@ -98,35 +108,33 @@ let mb = document.getElementById("mb").value;
 let gpu = document.getElementById("gpu").value;
 let psu = parseInt(document.getElementById("psu").value);
 
-let neededPower = 400;
-
-if(gpu==="RTX 3060") neededPower=550;
-if(gpu==="RTX 5080") neededPower=850;
-if(gpu==="RTX 5090") neededPower=1000;
-
-if(cpu==="" || mb===""){
-    result.innerHTML="<span class='bad'>Vyber CPU i základní desku!</span>";
+if(cpu === "" || mb === ""){
+    document.getElementById("result").innerHTML =
+    "❌ Vyber CPU a desku";
     return;
 }
 
-if(cpu!==mb){
-    result.innerHTML="<span class='bad'>❌ CPU není kompatibilní se základní deskou!</span>";
+if(cpu !== mb){
+    document.getElementById("result").innerHTML =
+    "❌ CPU není kompatibilní s deskou";
     return;
 }
 
-if(psu<neededPower){
-    result.innerHTML="<span class='bad'>❌ Zdroj je příliš slabý pro tuto grafiku!</span>";
-    return;
+let fps = Math.floor(Math.random()*250)+60;
+let temp = Math.floor(Math.random()*40)+40;
+
+document.getElementById("result").innerHTML =
+`
+✅ PC úspěšně sestaveno<br><br>
+
+🎮 FPS: ${fps}<br>
+🌡️ CPU teplota: ${temp}°C<br>
+💰 Peníze: ${money} Kč<br>
+🖥️ GPU: ${gpu}
+`;
+
 }
 
-let score=Math.floor(Math.random()*100)+1;
-
-result.innerHTML=
-"<span class='good'>✅ Počítač úspěšně sestaven!</span><br><br>"+
-"Výkon: "+score+"/100<br>"+
-"GPU: "+gpu+"<br>"+
-"Zdroj: "+psu+"W";
-}
 </script>
 
 </body>
