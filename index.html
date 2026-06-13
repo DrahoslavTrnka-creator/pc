@@ -2,139 +2,184 @@
 <html lang="cs">
 <head>
 <meta charset="UTF-8">
-<title>PC Builder Simulator</title>
+<title>PC Builder Simulator ULTRA</title>
 
 <style>
 body{
-    background:#111;
-    color:white;
+    margin:0;
     font-family:Arial;
-    text-align:center;
+    background:#0f0f0f;
+    color:white;
 }
 
-.box{
-    background:#222;
-    width:700px;
-    margin:auto;
-    padding:20px;
-    border-radius:15px;
-}
-
-select,button{
-    width:250px;
+#topbar{
+    background:#1c1c1c;
     padding:10px;
-    margin:5px;
+    display:flex;
+    flex-wrap:wrap;
 }
 
-#result{
-    margin-top:20px;
-    font-size:20px;
+button{
+    margin:5px;
+    padding:8px;
+    background:#333;
+    color:white;
+    border:0;
+    cursor:pointer;
+}
+
+#shop{
+    display:flex;
+    flex-wrap:wrap;
+    padding:10px;
+}
+
+.card{
+    width:220px;
+    background:#222;
+    margin:10px;
+    padding:10px;
+    border-radius:8px;
+}
+
+canvas{
+    width:100%;
+    height:200px;
+    background:black;
 }
 </style>
-
 </head>
+
 <body>
 
-<h1>🖥️ PC Builder Simulator</h1>
-
-<div class="box">
-
-<h2>CPU</h2>
-<select id="cpu">
-<option value="">Vyber CPU</option>
-<option value="LGA1155">Intel i7-3770K</option>
-<option value="LGA1700">Intel i5-14600K</option>
-<option value="AM4">Ryzen 7 5800X</option>
-<option value="AM5">Ryzen 7 9800X3D</option>
-</select>
-
-<h2>Motherboard</h2>
-<select id="mb">
-<option value="">Vyber desku</option>
-<option value="LGA1155">H61</option>
-<option value="LGA1700">Z790</option>
-<option value="AM4">B550</option>
-<option value="AM5">X870</option>
-</select>
-
-<h2>GPU</h2>
-<select id="gpu">
-<option>GTX 1060</option>
-<option>RTX 3060</option>
-<option>RTX 5080</option>
-<option>RTX 5090</option>
-</select>
-
-<h2>RAM</h2>
-<select id="ram">
-<option>16GB DDR4</option>
-<option>32GB DDR4</option>
-<option>64GB DDR5</option>
-<option>96GB DDR5</option>
-</select>
-
-<h2>SSD</h2>
-<select id="ssd">
-<option>512GB NVMe</option>
-<option>1TB NVMe</option>
-<option>2TB NVMe</option>
-<option>4TB NVMe</option>
-</select>
-
-<h2>PSU</h2>
-<select id="psu">
-<option value="500">500W</option>
-<option value="750">750W</option>
-<option value="1000">1000W</option>
-<option value="1200">1200W</option>
-</select>
-
-<br><br>
-
-<button onclick="buildPC()">Postavit PC</button>
-
-<div id="result"></div>
-
+<div id="topbar">
+<button onclick="show('cpu')">CPU</button>
+<button onclick="show('gpu')">GPU</button>
+<button onclick="show('ram')">RAM</button>
+<button onclick="show('ssd')">SSD</button>
+<button onclick="show('arm')">ARM</button>
+<button onclick="show('psu')">PSU</button>
+<button onclick="show('mb')">MB</button>
 </div>
+
+<canvas id="bench"></canvas>
+
+<div id="shop"></div>
 
 <script>
 
-let money = 100000;
+let money = 2000;
+let current = [];
 
-function buildPC(){
+const cpu = [
+{name:"Intel i3-12100F", power:70, price:110},
+{name:"Intel i5-12400F", power:95, price:170},
+{name:"Intel i7-14700K", power:230, price:500},
+{name:"Intel i9-14900K", power:280, price:750},
+{name:"AMD Ryzen 5 5600X", power:110, price:170},
+{name:"AMD Ryzen 7 7800X3D", power:220, price:420},
+{name:"AMD Ryzen 9 7950X", power:280, price:650},
+{name:"AMD EPYC 9654", power:420, price:2500}
+];
 
-let cpu = document.getElementById("cpu").value;
-let mb = document.getElementById("mb").value;
-let gpu = document.getElementById("gpu").value;
-let psu = parseInt(document.getElementById("psu").value);
+const gpu = [
+{name:"GTX 1650", power:60, price:130},
+{name:"RTX 3060", power:150, price:300},
+{name:"RTX 4070", power:220, price:600},
+{name:"RTX 4090", power:350, price:1800},
+{name:"RX 6600", power:140, price:250},
+{name:"RX 7900 XTX", power:340, price:1100}
+];
 
-if(cpu === "" || mb === ""){
-    document.getElementById("result").innerHTML =
-    "❌ Vyber CPU a desku";
-    return;
+const ram = [
+{name:"8GB DDR4", power:25, price:35},
+{name:"16GB DDR4", power:60, price:70},
+{name:"32GB DDR5", power:140, price:180},
+{name:"64GB DDR5", power:200, price:300}
+];
+
+const ssd = [
+{name:"HDD 1TB", power:15, price:30},
+{name:"SSD SATA 1TB", power:70, price:60},
+{name:"NVMe 1TB", power:130, price:110},
+{name:"NVMe Gen5 4TB", power:220, price:320}
+];
+
+const arm = [
+{name:"Apple M1", power:180, price:300},
+{name:"Apple M4", power:320, price:900},
+{name:"Snapdragon 8 Gen 3", power:220, price:300},
+{name:"Snapdragon X Elite", power:300, price:600},
+{name:"RISC-V Core", power:160, price:200}
+];
+
+const psu = [
+{name:"400W PSU", power:20, price:40},
+{name:"650W Bronze", power:70, price:90},
+{name:"850W Gold", power:130, price:150},
+{name:"1200W Titanium", power:220, price:300}
+];
+
+const mb = [
+{name:"H610", power:40, price:60},
+{name:"B660", power:70, price:110},
+{name:"Z790", power:140, price:260},
+{name:"AM5 X670", power:130, price:250}
+];
+
+function show(type){
+    if(type=="cpu") current = cpu;
+    if(type=="gpu") current = gpu;
+    if(type=="ram") current = ram;
+    if(type=="ssd") current = ssd;
+    if(type=="arm") current = arm;
+    if(type=="psu") current = psu;
+    if(type=="mb") current = mb;
+    render();
 }
 
-if(cpu !== mb){
-    document.getElementById("result").innerHTML =
-    "❌ CPU není kompatibilní s deskou";
-    return;
+function buy(item){
+    if(money >= item.price){
+        money -= item.price;
+        alert("Koupeno: " + item.name);
+        draw(item.power);
+    } else {
+        alert("Málo peněz!");
+    }
 }
 
-let fps = Math.floor(Math.random()*250)+60;
-let temp = Math.floor(Math.random()*40)+40;
+function render(){
+    let shop = document.getElementById("shop");
+    shop.innerHTML = "";
 
-document.getElementById("result").innerHTML =
-`
-✅ PC úspěšně sestaveno<br><br>
-
-🎮 FPS: ${fps}<br>
-🌡️ CPU teplota: ${temp}°C<br>
-💰 Peníze: ${money} Kč<br>
-🖥️ GPU: ${gpu}
-`;
-
+    current.forEach(i=>{
+        let div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+        <h3>${i.name}</h3>
+        <p>Výkon: ${i.power}</p>
+        <p>Cena: $${i.price}</p>
+        <button onclick='buy(${JSON.stringify(i)})'>Koupit</button>
+        `;
+        shop.appendChild(div);
+    });
 }
 
+function draw(power){
+    let c = document.getElementById("bench");
+    let ctx = c.getContext("2d");
+
+    ctx.fillStyle="black";
+    ctx.fillRect(0,0,c.width,c.height);
+
+    ctx.fillStyle="lime";
+    ctx.fillRect(20,50,power*2,30);
+
+    ctx.fillStyle="white";
+    ctx.fillText("Benchmark: " + power,20,30);
+}
+
+show("cpu");
 </script>
 
 </body>
